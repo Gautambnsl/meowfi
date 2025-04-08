@@ -1,6 +1,6 @@
 type UserAccount @entity {
   id: ID! # user address
-  factory: Bytes
+  factory: Bytes!
   nonce: BigInt!
   policies: [Policy!]! @derivedFrom(field: "user")
   vaultDeposits: [VaultDeposit!]! @derivedFrom(field: "user")

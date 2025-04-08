@@ -26,10 +26,16 @@ dataSources:
         - name: Modular4337Factory
           file: ./abis/Modular4337Factory.json
       eventHandlers:
+        - event: AccountDeployed(indexed address,address,bytes32)
+          handler: handleAccountDeployed
         - event: VaultAdded(indexed address)
           handler: handleVaultAdded
+        - event: VaultRemoved(indexed address)
+          handler: handleVaultRemoved
+        - event: WalletOwnershipSet(indexed address,indexed address)
+          handler: handleWalletOwnershipSet
       file: ./src/modular-4337-factory.ts
-      
+
 templates:
   - name: CamelotLiquidityManager
     kind: ethereum/contract
