@@ -1,0 +1,35 @@
+specVersion: 1.0.0
+indexerHints:
+  prune: auto
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: Modular4337Factory
+    network: arbitrum-sepolia
+    source:
+      address: "0x490e9b6F06a0b26BFdfAF146E4521ECbbf77bAFe"
+      abi: Modular4337Factory
+      startBlock: 140146879
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - AccountDeployed
+        - VaultAdded
+        - VaultRemoved
+        - WalletOwnershipSet
+      abis:
+        - name: Modular4337Factory
+          file: ./abis/Modular4337Factory.json
+      eventHandlers:
+        - event: AccountDeployed(indexed address,address,bytes32)
+          handler: handleAccountDeployed
+        - event: VaultAdded(indexed address)
+          handler: handleVaultAdded
+        - event: VaultRemoved(indexed address)
+          handler: handleVaultRemoved
+        - event: WalletOwnershipSet(indexed address,indexed address)
+          handler: handleWalletOwnershipSet
+      file: ./src/modular-4337-factory.ts

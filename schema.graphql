@@ -1,0 +1,34 @@
+type AccountDeployed @entity(immutable: true) {
+  id: Bytes!
+  owner: Bytes! # address
+  account: Bytes! # address
+  salt: Bytes! # bytes32
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type VaultAdded @entity(immutable: true) {
+  id: Bytes!
+  vault: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type VaultRemoved @entity(immutable: true) {
+  id: Bytes!
+  vault: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type WalletOwnershipSet @entity(immutable: true) {
+  id: Bytes!
+  wallet: Bytes! # address
+  owner: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
