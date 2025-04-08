@@ -33,3 +33,19 @@ dataSources:
         - event: WalletOwnershipSet(indexed address,indexed address)
           handler: handleWalletOwnershipSet
       file: ./src/modular-4337-factory.ts
+templates:
+  - name: CamelotLiquidityManager
+    kind: ethereum/contract
+    network: arbitrum-sepolia
+    source:
+      abi: CamelotLiquidityManager
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - CamelotLiquidityManager
+      abis:
+        - name: CamelotLiquidityManager
+          file: ./abis/CamelotLiquidityManager.json
+      file: ./src/CamelotLiquidityManager.ts
