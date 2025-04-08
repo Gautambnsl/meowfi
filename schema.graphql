@@ -1,34 +1,82 @@
-type AccountDeployed @entity(immutable: true) {
-  id: Bytes!
-  owner: Bytes! # address
-  account: Bytes! # address
-  salt: Bytes! # bytes32
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
+type UserAccount @entity {
+  id: ID! # user address
+  factory: Bytes
+  nonce: BigInt!
+  policies: [Policy!]! @derivedFrom(field: "user")
+  vaultDeposits: [VaultDeposit!]! @derivedFrom(field: "user")
+  positions: [Position!]! @derivedFrom(field: "user")
 }
 
-type VaultAdded @entity(immutable: true) {
-  id: Bytes!
-  vault: Bytes! # address
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
+type Policy @entity {
+  id: ID!
+  user: UserAccount!
+  targetDestination: Bytes!
+  fromAddress: Bytes!
+  calldata: Bytes!
+  createdAt: BigInt!
 }
 
-type VaultRemoved @entity(immutable: true) {
-  id: Bytes!
-  vault: Bytes! # address
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
+type Vault @entity {
+  id: ID! # contract address
+  token0: Bytes!
+  token1: Bytes!
+  treasury: Bytes!
+  treasuryFeePercent: BigInt!
+  minAmount0: BigInt!
+  maxAmount0: BigInt!
+  minAmount1: BigInt!
+  maxAmount1: BigInt!
+  tickSpacing: BigInt!
+  vaultDeposits: [VaultDeposit!]! @derivedFrom(field: "vault")
+  positions: [Position!]! @derivedFrom(field: "vault")
+  createdAt: BigInt!
 }
 
-type WalletOwnershipSet @entity(immutable: true) {
-  id: Bytes!
-  wallet: Bytes! # address
-  owner: Bytes! # address
-  blockNumber: BigInt!
+type VaultDeposit @entity {
+  id: ID! # vault address + user address + deposit index
+  vault: Vault!
+  user: UserAccount!
+  positions: [Position!]! @derivedFrom(field: "vaultDeposit")
+  createdAt: BigInt!
+}
+
+type Position @entity {
+  id: ID! # unique identifier for position
+  nftId: BigInt! # the position NFT ID
+  user: UserAccount!
+  vault: Vault!
+  vaultDeposit: VaultDeposit!
+  fee0: BigInt!
+  fee1: BigInt!
+  nonce: BigInt!
+  liquidity: BigInt!
+  createdAt: BigInt!
+  updatedAt: BigInt!
+}
+
+# Basic event entities
+type TreasuryUpdate @entity {
+  id: ID!
+  vault: Vault!
+  treasury: Bytes!
+  treasuryFeePercent: BigInt!
   blockTimestamp: BigInt!
-  transactionHash: Bytes!
+}
+
+type TokenPairUpdate @entity {
+  id: ID!
+  vault: Vault!
+  token0: Bytes!
+  token1: Bytes!
+  blockTimestamp: BigInt!
+}
+
+type AmountLimitsUpdate @entity {
+  id: ID!
+  vault: Vault!
+  minAmount0: BigInt!
+  maxAmount0: BigInt!
+  minAmount1: BigInt!
+  maxAmount1: BigInt!
+  blockTimestamp: BigInt!
 }

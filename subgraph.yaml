@@ -1,8 +1,10 @@
 specVersion: 1.0.0
 indexerHints:
   prune: auto
+
 schema:
   file: ./schema.graphql
+
 dataSources:
   - kind: ethereum
     name: Modular4337Factory
@@ -24,15 +26,10 @@ dataSources:
         - name: Modular4337Factory
           file: ./abis/Modular4337Factory.json
       eventHandlers:
-        - event: AccountDeployed(indexed address,address,bytes32)
-          handler: handleAccountDeployed
         - event: VaultAdded(indexed address)
           handler: handleVaultAdded
-        - event: VaultRemoved(indexed address)
-          handler: handleVaultRemoved
-        - event: WalletOwnershipSet(indexed address,indexed address)
-          handler: handleWalletOwnershipSet
       file: ./src/modular-4337-factory.ts
+      
 templates:
   - name: CamelotLiquidityManager
     kind: ethereum/contract
@@ -45,7 +42,34 @@ templates:
       language: wasm/assemblyscript
       entities:
         - CamelotLiquidityManager
+        - UserAccount
+        - Policy
+        - Vault
+        - VaultDeposit
+        - Position
+        - TreasuryUpdate
+        - TokenPairUpdate
+        - AmountLimitsUpdate
       abis:
         - name: CamelotLiquidityManager
           file: ./abis/CamelotLiquidityManager.json
+      eventHandlers:
+        - event: Minted(uint256,uint128)
+          handler: handleMinted
+        - event: Burned(uint256,uint256,uint256)
+          handler: handleBurned
+        - event: LiquidityIncreased(uint256,uint128,uint256,uint256)
+          handler: handleLiquidityIncreased
+        - event: LiquidityDecreased(uint256,uint128,uint256,uint256)
+          handler: handleLiquidityDecreased
+        - event: Rebalanced(uint256,uint256,uint128)
+          handler: handleRebalanced
+        - event: CollectFee(uint256,uint256,uint256)
+          handler: handleCollectFee
+        - event: TreasuryUpdated(address,uint256)
+          handler: handleTreasuryUpdated
+        - event: TokenPairUpdated(address,address)
+          handler: handleTokenPairUpdated
+        - event: AmountLimitsUpdated(uint256,uint256,uint256,uint256)
+          handler: handleAmountLimitsUpdated
       file: ./src/CamelotLiquidityManager.ts
