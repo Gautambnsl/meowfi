@@ -25,6 +25,8 @@ dataSources:
       abis:
         - name: Modular4337Factory
           file: ./abis/Modular4337Factory.json
+        - name: CamelotLiquidityManager
+          file: ./abis/CamelotLiquidityManager.json
       eventHandlers:
         - event: AccountDeployed(indexed address,address,bytes32)
           handler: handleAccountDeployed
