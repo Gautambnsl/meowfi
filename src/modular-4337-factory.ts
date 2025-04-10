@@ -18,8 +18,10 @@ function getOrCreateUserAccount(address: string): UserAccount {
 
 	if (user == null) {
 		user = new UserAccount(address);
-		user.nonce = BigInt.fromI32(0);
 		user.factory = Bytes.fromHexString(
+			"0x0000000000000000000000000000000000000000"
+		); // Will update when available
+		user.account = Bytes.fromHexString(
 			"0x0000000000000000000000000000000000000000"
 		); // Will update when available
 		user.save();
@@ -50,6 +52,7 @@ function getOrCreateVault(address: string): Vault {
 		vault.maxAmount1 = BigInt.fromI32(0);
 		vault.tickSpacing = BigInt.fromI32(0);
 		vault.createdAt = BigInt.fromI32(0);
+    vault.active = false;
 		vault.save();
 	}
 
@@ -71,6 +74,10 @@ export function handleAccountDeployed(event: AccountDeployedEvent): void {
 		user.factory = event.address;
 	}
 
+  user.account = event.params.account;
+  user.createdAt = event.block.timestamp;
+
+
 	// Save the updated user account
 	user.save();
 }
@@ -85,6 +92,8 @@ export function handleVaultAdded(event: VaultAddedEvent): void {
 
 	// Get or create the vault entity
 	let vault = getOrCreateVault(vaultAddress);
+
+  vault.active = true;
 
 	// Fetch Treasury configuration
 	let tryTreasury = vaultContract.try_treasury();
@@ -153,23 +162,9 @@ export function handleVaultRemoved(event: VaultRemovedEvent): void {
 
 	let vault = Vault.load(vaultAddress);
 	if (vault) {
-		// If you had an 'active' field, you could set it to false here
-		// vault.active = false
+		vault.active = false
 		vault.save();
 	}
 }
 
-// Handle WalletOwnershipSet event
-export function handleWalletOwnershipSet(event: WalletOwnershipSetEvent): void {
-	// Get the owner address from the event
-	let ownerAddress = event.params.owner.toHexString();
 
-	// Get or create the user account
-	let user = getOrCreateUserAccount(ownerAddress);
-
-	// The wallet address is associated with this user
-	// If you had a wallet entity or a wallets array in UserAccount, you could update it here
-
-	// Save the user account
-	user.save();
-}

@@ -32,7 +32,6 @@ function getOrCreateUserAccount(address: string): UserAccount {
   
   if (user == null) {
     user = new UserAccount(address)
-    user.nonce = BigInt.fromI32(0)
     user.factory = Bytes.fromHexString("0x0000000000000000000000000000000000000000")
     user.save()
   }
@@ -170,23 +169,41 @@ export function handleRebalanced(event: RebalancedEvent): void {
   let newTokenId = event.params.newTokenId
   let newLiquidity = event.params.newLiquidity
   let vaultAddress = event.address.toHexString()
-  let userAddress = event.transaction.from.toHexString() // This is a simplification
   
-  // Mark old position as rebalanced (zero liquidity)
+  // Get old position
   let oldPosition = Position.load(oldTokenId.toString())
+  
   if (oldPosition) {
+    // Create new position (if it doesn't exist yet)
+    let newPosition = Position.load(newTokenId.toString())
+    
+    if (newPosition == null) {
+      newPosition = new Position(newTokenId.toString())
+      newPosition.nftId = newTokenId
+      newPosition.user = oldPosition.user // Copy user reference
+      newPosition.vault = oldPosition.vault // Copy vault reference
+      newPosition.vaultDeposit = oldPosition.vaultDeposit // Copy vault deposit reference
+      newPosition.fee0 = oldPosition.fee0 // Transfer accumulated fees
+      newPosition.fee1 = oldPosition.fee1
+      newPosition.nonce = oldPosition.nonce.plus(BigInt.fromI32(1)) // Increment nonce
+      newPosition.createdAt = event.block.timestamp
+    } else {
+      // If new position already exists, update its properties
+      newPosition.fee0 = newPosition.fee0.plus(oldPosition.fee0)
+      newPosition.fee1 = newPosition.fee1.plus(oldPosition.fee1)
+      newPosition.nonce = newPosition.nonce.plus(BigInt.fromI32(1))
+    }
+    
+    // Set the new liquidity and update timestamp
+    newPosition.liquidity = newLiquidity
+    newPosition.updatedAt = event.block.timestamp
+    newPosition.save()
+    
+    // Mark old position as inactive by setting liquidity to 0
     oldPosition.liquidity = BigInt.fromI32(0)
     oldPosition.updatedAt = event.block.timestamp
-    oldPosition.nonce = oldPosition.nonce.plus(BigInt.fromI32(1))
     oldPosition.save()
   }
-  
-  // Create or update new position with the rebalanced liquidity
-  let newPosition = getOrCreatePosition(newTokenId, userAddress, vaultAddress)
-  newPosition.liquidity = newLiquidity
-  newPosition.updatedAt = event.block.timestamp
-  newPosition.nonce = newPosition.nonce.plus(BigInt.fromI32(1))
-  newPosition.save()
 }
 
 // Handle CollectFee event
@@ -275,5 +292,3 @@ export function handleAmountLimitsUpdated(event: AmountLimitsUpdatedEvent): void
 
 // You'll need to add additional handlers for factory events like:
 // - Policy creation
-// - Factory registration
-// - User account creation

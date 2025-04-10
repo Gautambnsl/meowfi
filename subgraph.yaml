@@ -34,8 +34,6 @@ dataSources:
           handler: handleVaultAdded
         - event: VaultRemoved(indexed address)
           handler: handleVaultRemoved
-        - event: WalletOwnershipSet(indexed address,indexed address)
-          handler: handleWalletOwnershipSet
       file: ./src/modular-4337-factory.ts
 
 templates:

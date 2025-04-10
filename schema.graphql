@@ -1,11 +1,13 @@
 type UserAccount @entity {
   id: ID! # user address
+  account : Bytes!
   factory: Bytes!
-  nonce: BigInt!
   policies: [Policy!]! @derivedFrom(field: "user")
   vaultDeposits: [VaultDeposit!]! @derivedFrom(field: "user")
   positions: [Position!]! @derivedFrom(field: "user")
+  createdAt: BigInt
 }
+
 
 type Policy @entity {
   id: ID!
@@ -17,7 +19,9 @@ type Policy @entity {
 }
 
 type Vault @entity {
-  id: ID! # contract address
+  id: ID! # contract 
+  positionManager: Bytes
+  active: Boolean!
   token0: Bytes!
   token1: Bytes!
   treasury: Bytes!
