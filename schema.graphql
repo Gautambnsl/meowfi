@@ -1,13 +1,14 @@
 type UserAccount @entity {
   id: ID! # user address
-  account : Bytes!
+  account: Bytes!
   factory: Bytes!
+  nonce: BigInt!
   policies: [Policy!]! @derivedFrom(field: "user")
   vaultDeposits: [VaultDeposit!]! @derivedFrom(field: "user")
   positions: [Position!]! @derivedFrom(field: "user")
-  createdAt: BigInt
+  createdAt: BigInt!
+  updatedAt: BigInt!
 }
-
 
 type Policy @entity {
   id: ID!
@@ -19,9 +20,8 @@ type Policy @entity {
 }
 
 type Vault @entity {
-  id: ID! # contract 
-  positionManager: Bytes
-  active: Boolean!
+  id: ID! # contract address
+  positionManager: Bytes!
   token0: Bytes!
   token1: Bytes!
   treasury: Bytes!
@@ -31,21 +31,25 @@ type Vault @entity {
   minAmount1: BigInt!
   maxAmount1: BigInt!
   tickSpacing: BigInt!
+  active: Boolean!
   vaultDeposits: [VaultDeposit!]! @derivedFrom(field: "vault")
   positions: [Position!]! @derivedFrom(field: "vault")
   createdAt: BigInt!
+  updatedAt: BigInt!
 }
 
 type VaultDeposit @entity {
-  id: ID! # vault address + user address + deposit index
+  id: ID! # vault address + user address
   vault: Vault!
   user: UserAccount!
   positions: [Position!]! @derivedFrom(field: "vaultDeposit")
+  activePositionCount: Int!
   createdAt: BigInt!
+  updatedAt: BigInt!
 }
 
 type Position @entity {
-  id: ID! # unique identifier for position
+  id: ID! # Composite: vault address + "-" + user address + "-" + tokenId
   nftId: BigInt! # the position NFT ID
   user: UserAccount!
   vault: Vault!
@@ -54,6 +58,9 @@ type Position @entity {
   fee1: BigInt!
   nonce: BigInt!
   liquidity: BigInt!
+  lowerTick: Int!
+  upperTick: Int!
+  active: Boolean!
   createdAt: BigInt!
   updatedAt: BigInt!
 }

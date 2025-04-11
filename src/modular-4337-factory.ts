@@ -8,9 +8,9 @@ import {
 import { UserAccount, Vault } from "../generated/schema";
 
 import { Address, BigInt, Bytes } from "@graphprotocol/graph-ts";
-import { CamelotLiquidityManager as CamelotLiquidityManagerContract} from "../generated/templates";
+import { CamelotLiquidityManager as CamelotLiquidityManagerContract } from "../generated/templates";
 
-import {CamelotLiquidityManager} from "../generated/Modular4337Factory/CamelotLiquidityManager";
+import { CamelotLiquidityManager } from "../generated/Modular4337Factory/CamelotLiquidityManager";
 
 // Helper function to ensure UserAccount exists
 function getOrCreateUserAccount(address: string): UserAccount {
@@ -24,6 +24,9 @@ function getOrCreateUserAccount(address: string): UserAccount {
 		user.account = Bytes.fromHexString(
 			"0x0000000000000000000000000000000000000000"
 		); // Will update when available
+		user.nonce = BigInt.fromI32(0);
+		user.createdAt = BigInt.fromI32(0);
+		user.updatedAt = BigInt.fromI32(0);
 		user.save();
 	}
 
@@ -45,6 +48,9 @@ function getOrCreateVault(address: string): Vault {
 		vault.treasury = Bytes.fromHexString(
 			"0x0000000000000000000000000000000000000000"
 		);
+		vault.positionManager = Bytes.fromHexString(
+			"0x0000000000000000000000000000000000000000"
+		);
 		vault.treasuryFeePercent = BigInt.fromI32(0);
 		vault.minAmount0 = BigInt.fromI32(0);
 		vault.maxAmount0 = BigInt.fromI32(0);
@@ -52,7 +58,8 @@ function getOrCreateVault(address: string): Vault {
 		vault.maxAmount1 = BigInt.fromI32(0);
 		vault.tickSpacing = BigInt.fromI32(0);
 		vault.createdAt = BigInt.fromI32(0);
-    vault.active = false;
+		vault.updatedAt = BigInt.fromI32(0);
+		vault.active = false;
 		vault.save();
 	}
 
@@ -74,9 +81,9 @@ export function handleAccountDeployed(event: AccountDeployedEvent): void {
 		user.factory = event.address;
 	}
 
-  user.account = event.params.account;
-  user.createdAt = event.block.timestamp;
-
+	user.account = event.params.account;
+	user.createdAt = event.block.timestamp;
+	user.updatedAt = event.block.timestamp;
 
 	// Save the updated user account
 	user.save();
@@ -93,7 +100,7 @@ export function handleVaultAdded(event: VaultAddedEvent): void {
 	// Get or create the vault entity
 	let vault = getOrCreateVault(vaultAddress);
 
-  vault.active = true;
+	vault.active = true;
 
 	// Fetch Treasury configuration
 	let tryTreasury = vaultContract.try_treasury();
@@ -142,8 +149,15 @@ export function handleVaultAdded(event: VaultAddedEvent): void {
 		vault.maxAmount1 = tryMaxAmount1.value;
 	}
 
-	// Set creation timestamp
+	// Try to fetch position manager
+	let tryPositionManager = vaultContract.try_positionManager();
+	if (!tryPositionManager.reverted) {
+		vault.positionManager = tryPositionManager.value;
+	}
+
+	// Set creation and update timestamps
 	vault.createdAt = event.block.timestamp;
+	vault.updatedAt = event.block.timestamp;
 
 	// Save the updated vault entity
 	vault.save();
@@ -158,13 +172,26 @@ export function handleVaultRemoved(event: VaultRemovedEvent): void {
 	let vaultAddress = event.params.vault.toHexString();
 
 	// We don't actually remove the vault entity, as that would lose historical data
-	// Instead, we could mark it as inactive if needed (you would need to add an 'active' field to the Vault entity)
-
+	// Instead, we mark it as inactive
 	let vault = Vault.load(vaultAddress);
 	if (vault) {
-		vault.active = false
+		vault.active = false;
+		vault.updatedAt = event.block.timestamp;
 		vault.save();
 	}
 }
 
+// Handle WalletOwnershipSet event
+export function handleWalletOwnershipSet(event: WalletOwnershipSetEvent): void {
+	// Get the owner address from the event
+	let ownerAddress = event.params.owner.toHexString();
 
+	// Get or create the user account
+	let user = getOrCreateUserAccount(ownerAddress);
+
+	// Update user timestamp
+	user.updatedAt = event.block.timestamp;
+
+	// Save the user account
+	user.save();
+}
