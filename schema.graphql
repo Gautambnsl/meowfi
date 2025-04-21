@@ -58,8 +58,6 @@ type Position @entity {
   fee1: BigInt!
   nonce: BigInt!
   liquidity: BigInt!
-  lowerTick: Int!
-  upperTick: Int!
   active: Boolean!
   createdAt: BigInt!
   updatedAt: BigInt!

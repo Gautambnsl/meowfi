@@ -102,8 +102,6 @@ function getOrCreatePosition(tokenId: BigInt, userAddress: string, vaultAddress:
     position.fee1 = BigInt.fromI32(0)
     position.nonce = BigInt.fromI32(0)
     position.liquidity = BigInt.fromI32(0)
-    position.lowerTick = 0
-    position.upperTick = 0
     position.active = true
     position.createdAt = BigInt.fromI32(0)
     position.updatedAt = BigInt.fromI32(0)
@@ -310,8 +308,6 @@ export function handleRebalanced(event: RebalancedEvent): void {
       newPosition.fee0 = oldPosition.fee0
       newPosition.fee1 = oldPosition.fee1
       newPosition.nonce = oldPosition.nonce.plus(BigInt.fromI32(1))
-      newPosition.lowerTick = 0 // Would need additional data to set these correctly
-      newPosition.upperTick = 0
       newPosition.active = true
       newPosition.createdAt = event.block.timestamp
     } else {
