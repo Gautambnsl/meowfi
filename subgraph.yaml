@@ -8,11 +8,11 @@ schema:
 dataSources:
   - kind: ethereum
     name: Modular4337Factory
-    network: arbitrum-sepolia
+    network: arbitrum
     source:
-      address: "0x490e9b6F06a0b26BFdfAF146E4521ECbbf77bAFe"
+      address: "0x0e16a3A01c54a79b692DC58c891BF9d8c0b18FA9"
       abi: Modular4337Factory
-      startBlock: 140146879
+      startBlock: 327730138
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -39,7 +39,7 @@ dataSources:
 templates:
   - name: CamelotLiquidityManager
     kind: ethereum/contract
-    network: arbitrum-sepolia
+    network: arbitrum
     source:
       abi: CamelotLiquidityManager
     mapping:
