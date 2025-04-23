@@ -60,6 +60,7 @@ function getOrCreateVault(address: string): Vault {
     vault.active = true
     vault.createdAt = BigInt.fromI32(0)
     vault.updatedAt = BigInt.fromI32(0)
+    vault.pool = Bytes.fromHexString("0x0000000000000000000000000000000000000000");
     vault.save()
   }
   

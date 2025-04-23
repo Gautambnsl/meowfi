@@ -36,7 +36,7 @@ function getOrCreateUserAccount(address: string): UserAccount {
 // Helper function to ensure Vault exists
 function getOrCreateVault(address: string): Vault {
 	let vault = Vault.load(address);
-
+	
 	if (vault == null) {
 		vault = new Vault(address);
 		vault.token0 = Bytes.fromHexString(
@@ -49,6 +49,9 @@ function getOrCreateVault(address: string): Vault {
 			"0x0000000000000000000000000000000000000000"
 		);
 		vault.positionManager = Bytes.fromHexString(
+			"0x0000000000000000000000000000000000000000"
+		);
+		vault.pool = Bytes.fromHexString(
 			"0x0000000000000000000000000000000000000000"
 		);
 		vault.treasuryFeePercent = BigInt.fromI32(0);
@@ -153,6 +156,12 @@ export function handleVaultAdded(event: VaultAddedEvent): void {
 	let tryPositionManager = vaultContract.try_positionManager();
 	if (!tryPositionManager.reverted) {
 		vault.positionManager = tryPositionManager.value;
+	}
+
+	// Try to fetch pool
+	let try_pool = vaultContract.try_pool();
+	if (!tryPositionManager.reverted) {
+		vault.pool = try_pool.value;
 	}
 
 	// Set creation and update timestamps

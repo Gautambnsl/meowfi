@@ -8,7 +8,7 @@ schema:
 dataSources:
   - kind: ethereum
     name: Modular4337Factory
-    network: arbitrum
+    network: arbitrum-one
     source:
       address: "0x0e16a3A01c54a79b692DC58c891BF9d8c0b18FA9"
       abi: Modular4337Factory
@@ -39,7 +39,7 @@ dataSources:
 templates:
   - name: CamelotLiquidityManager
     kind: ethereum/contract
-    network: arbitrum
+    network: arbitrum-one
     source:
       abi: CamelotLiquidityManager
     mapping:

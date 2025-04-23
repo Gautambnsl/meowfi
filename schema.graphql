@@ -22,6 +22,7 @@ type Policy @entity {
 type Vault @entity {
   id: ID! # contract address
   positionManager: Bytes!
+  pool: Bytes!
   token0: Bytes!
   token1: Bytes!
   treasury: Bytes!
